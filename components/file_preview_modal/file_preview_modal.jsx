@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Modal} from 'react-bootstrap';
 
-import {getFilePreviewUrl, getFileUrl, getFileDownloadUrl} from 'mattermost-redux/utils/file_utils';
+import {getFileDownloadUrl, getFilePreviewUrl, getFileUrl} from 'mattermost-redux/utils/file_utils';
 
 import * as GlobalActions from 'actions/global_actions';
 import Constants, {FileTypes, ZoomSettings} from 'utils/constants';
@@ -14,10 +14,14 @@ import AudioVideoPreview from 'components/audio_video_preview';
 import CodePreview from 'components/code_preview';
 import FileInfoPreview from 'components/file_info_preview';
 import LoadingImagePreview from 'components/loading_image_preview';
-const PDFPreview = React.lazy(() => import('components/pdf_preview'));
 
+import FileViewHeader from './file_preview_header';
 import ImagePreview from './image_preview';
 import PopoverBar from './popover_bar';
+
+import './file_preview_modal.scss';
+
+const PDFPreview = React.lazy(() => import('components/pdf_preview'));
 
 const KeyCodes = Constants.KeyCodes;
 
@@ -264,7 +268,7 @@ export default class FilePreviewModal extends React.PureComponent {
         const fileUrl = fileInfo.link || getFileUrl(fileInfo.id);
         const fileDownloadUrl = fileInfo.link || getFileDownloadUrl(fileInfo.id);
         const isExternalFile = !fileInfo.id;
-        let dialogClassName = 'a11y__modal modal-image';
+        let dialogClassName = 'a11y__modal modal-image file-preview-modal';
 
         let content;
         let modalImageClass = '';
@@ -339,96 +343,71 @@ export default class FilePreviewModal extends React.PureComponent {
             }
         }
 
-        let leftArrow = null;
-        let rightArrow = null;
-        if (this.props.fileInfos.length > 1) {
-            leftArrow = (
-                <a
-                    id='previewArrowLeft'
-                    ref={this.previewArrowLeft}
-                    className='modal-prev-bar'
-                    href='#'
-                    onClick={this.handlePrev}
-                >
-                    <i className='image-control image-prev'/>
-                </a>
-            );
-
-            rightArrow = (
-                <a
-                    id='previewArrowRight'
-                    ref={this.previewArrowRight}
-                    className='modal-next-bar'
-                    href='#'
-                    onClick={this.handleNext}
-                >
-                    <i className='image-control image-next'/>
-                </a>
-            );
-        }
-
-        let closeButton;
-        if (this.state.showCloseBtn) {
-            closeButton = (
-                <div
-                    className='modal-close'
-                    onClick={this.handleModalClose}
-                />
-            );
-        }
-
         return (
             <Modal
                 show={this.props.show}
                 onHide={this.handleModalClose}
-                className='modal-image'
+                className='modal-image file-view-modal'
                 dialogClassName={dialogClassName}
+                backdrop={false}
                 role='dialog'
                 aria-labelledby='viewImageModalLabel'
             >
-                <Modal.Body>
+                <Modal.Body className='file-preview-modal__body'>
                     <div
                         className={'modal-image__wrapper'}
                         onClick={this.handleModalClose}
                     >
                         <div
+                            className='file-preview-modal__main-ctr'
                             onMouseEnter={this.onMouseEnterImage}
                             onMouseLeave={this.onMouseLeaveImage}
                             onClick={(e) => e.stopPropagation()}
                         >
                             <Modal.Title
-                                componentClass='h1'
+                                componentClass='div'
                                 id='viewImageModalLabel'
-                                className='hide'
+                                className=''
                             >
-                                {fileName}
+                                <FileViewHeader
+                                    post={this.props.post}
+                                    showPublicLink={showPublicLink}
+                                    fileIndex={this.state.imageIndex}
+                                    totalFiles={this.props.fileInfos?.length}
+                                    filename={fileName}
+                                    fileURL={fileDownloadUrl}
+                                    enablePublicLink={this.props.enablePublicLink || false}
+                                    canDownloadFiles={this.props.canDownloadFiles || false}
+                                    isExternalFile={isExternalFile}
+                                    onGetPublicLink={this.handleGetPublicLink}
+                                    handlePrev={(e) => this.handlePrev(e)}
+                                    handleNext={(e) => this.handleNext(e)}
+                                    handleModalClose={() => this.handleModalClose()}
+                                />
                             </Modal.Title>
-                            {closeButton}
-                            <div className='modal-image__background'>
-                                <div className={`modal-image__content${modalImageClass}`}>
-                                    {content}
-                                </div>
+                            <div
+                                className='file-preview-modal__content'
+                            >
+                                {content}
                             </div>
-                            <PopoverBar
-                                showPublicLink={showPublicLink}
-                                fileIndex={this.state.imageIndex}
-                                totalFiles={this.props.fileInfos.length}
-                                filename={fileName}
-                                fileURL={fileDownloadUrl}
-                                enablePublicLink={this.props.enablePublicLink}
-                                canDownloadFiles={this.props.canDownloadFiles}
-                                isExternalFile={isExternalFile}
-                                onGetPublicLink={this.handleGetPublicLink}
-                                scale={this.state.scale[this.state.imageIndex]}
-                                showZoomControls={this.state.showZoomControls}
-                                handleZoomIn={this.handleZoomIn}
-                                handleZoomOut={this.handleZoomOut}
-                                handleZoomReset={this.handleZoomReset}
-                            />
+                            {/*<PopoverBar*/}
+                            {/*    showPublicLink={showPublicLink}*/}
+                            {/*    fileIndex={this.state.imageIndex}*/}
+                            {/*    totalFiles={this.props.fileInfos.length}*/}
+                            {/*    filename={fileName}*/}
+                            {/*    fileURL={fileDownloadUrl}*/}
+                            {/*    enablePublicLink={this.props.enablePublicLink}*/}
+                            {/*    canDownloadFiles={this.props.canDownloadFiles}*/}
+                            {/*    isExternalFile={isExternalFile}*/}
+                            {/*    onGetPublicLink={this.handleGetPublicLink}*/}
+                            {/*    scale={this.state.scale[this.state.imageIndex]}*/}
+                            {/*    showZoomControls={this.state.showZoomControls}*/}
+                            {/*    handleZoomIn={this.handleZoomIn}*/}
+                            {/*    handleZoomOut={this.handleZoomOut}*/}
+                            {/*    handleZoomReset={this.handleZoomReset}*/}
+                            {/*/>*/}
                         </div>
                     </div>
-                    {leftArrow}
-                    {rightArrow}
                 </Modal.Body>
             </Modal>
         );

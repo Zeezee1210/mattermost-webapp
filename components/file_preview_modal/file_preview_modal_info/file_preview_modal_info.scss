@@ -1,0 +1,28 @@
+.file-preview-modal{
+    &__info{
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+
+        &-details{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-left: 12px;
+        }
+    }
+    &__avatar{
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+    }
+    &__file-name{
+        margin: 0;
+        font-weight: 600;
+        line-height: 24px;
+    }
+    &__channel{
+        opacity: 0.56;
+    }
+}

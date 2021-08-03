@@ -1,0 +1,22 @@
+.file-preview-header{
+    display: grid;
+    grid-template-columns: 33% 34% 33%;
+    width: 100%;
+    background: black;
+    color: white;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    height: 72px;
+    &__actions{
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+    }
+    &__action-item{
+        margin-left: 10px;
+        background: transparent;
+        border: unset;
+    }
+}
